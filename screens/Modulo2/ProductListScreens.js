@@ -10,7 +10,7 @@ const INITIAL_PRODUCTS = [
   { id: '6', codigo: 'P006', nombre: 'Juego de Cubiertos (Tenedor/Cuchillo)', categoria: 'Cubiertos', marca: 'SV Plastic', stock: 800, ubicacion: 'Estante C2' },
 ];
 
-export default function ProductListScreen() {
+export default function ProductListScreen({ navigation }) {
   const [busqueda, setBusqueda] = useState('');
   const [productos] = useState(INITIAL_PRODUCTS);
 
@@ -23,7 +23,7 @@ export default function ProductListScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.titulo}>Catálogo de Productos</Text>
-        <TouchableOpacity style={styles.btnNuevo} onPress={() => {}}>
+        <TouchableOpacity style={styles.btnNuevo} onPress={() => navigation.navigate('ProductForm')       }>
           <Text style={styles.btnNuevoTexto}>+ Nuevo</Text>
         </TouchableOpacity>
       </View>
