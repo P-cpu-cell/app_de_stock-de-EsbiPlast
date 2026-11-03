@@ -57,14 +57,14 @@ export default function ProductFormScreen() {
 
           <Text style={styles.label}>Precios</Text>
           <View style={styles.row}>
-            <TextInput style={[styles.input, styles.half]} placeholder="Compra" keyboardDataType="numeric" value={form.precioCompra} onChangeText={(val) => handleChange('precioCompra', val)} />
-            <TextInput style={[styles.input, styles.half]} placeholder="Venta" keyboardDataType="numeric" value={form.precioVenta} onChangeText={(val) => handleChange('precioVenta', val)} />
+            <TextInput style={[styles.input, styles.half]} placeholder="Compra" keyboardType="numeric" value={form.precioCompra} onChangeText={(val) => handleChange('precioCompra', val)} />
+            <TextInput style={[styles.input, styles.half]} placeholder="Venta" keyboardType="numeric" value={form.precioVenta} onChangeText={(val) => handleChange('precioVenta', val)} />
           </View>
 
           <Text style={styles.label}>Stock Actual / Mínimo</Text>
           <View style={styles.row}>
-            <TextInput style={[styles.input, styles.half]} placeholder="Actual" keyboardDataType="numeric" value={form.stockActual} onChangeText={(val) => handleChange('stockActual', val)} />
-            <TextInput style={[styles.input, styles.half]} placeholder="Mínimo" keyboardDataType="numeric" value={form.stockMinimo} onChangeText={(val) => handleChange('stockMinimo', val)} />
+            <TextInput style={[styles.input, styles.half]} placeholder="Actual" keyboardType="numeric" value={form.stockActual} onChangeText={(val) => handleChange('stockActual', val)} />
+            <TextInput style={[styles.input, styles.half]} placeholder="Mínimo" keyboardType="numeric" value={form.stockMinimo} onChangeText={(val) => handleChange('stockMinimo', val)} />
           </View>
 
           <Text style={styles.label}>Ubicación Física *</Text>
