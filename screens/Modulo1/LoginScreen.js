@@ -12,18 +12,32 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 // Recibimos { navigation } por propiedades
 export default function LoginScreen({ navigation }) {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
 
-  const handleIngresar = () => {
-    // Aquí puedes agregar tu validación real de usuario y contraseña si lo deseas
-    console.log('Ingresando con:', usuario, contrasena);
+  const handleIngresar = async () => {
+    if (!usuario || !contrasena) {
+      alert('Por favor, completá todos los campos.');
+      return;
+    }
+    try{
+      const datosUsuario = {
+        usuario: usuario,
+        fechalogin: new Date().toISOString(),
+      };
+      await AsyncStorage.setItem('esbiPlasticUsuario', JSON.stringify(datosUsuario));
+      console.log('Datos de usuario guardados en AsyncStorage:', datosUsuario);
 
-    // Redirige al listado de productos y evita que el usuario pueda volver atrás con el botón "Atras" del celular
     navigation.replace('ProductList'); 
+    } 
+    catch (error) {
+      console.error('Error al guardar los datos en AsyncStorage:', error);
+    }
   };
 
   return (
@@ -42,7 +56,7 @@ export default function LoginScreen({ navigation }) {
               style={styles.logo}
               resizeMode="contain"
             />
-            <Text style={styles.subtituloEmpresa}>SV PLASTIC</Text>
+            <Text style={styles.subtituloEmpresa}>Esbi PLASTIC</Text>
             <Text style={styles.tituloApp}>Stock App</Text>
           </View>
 
@@ -76,6 +90,9 @@ export default function LoginScreen({ navigation }) {
               <Text style={styles.textoBoton}>Ingresar  →</Text>
             </TouchableOpacity>
           </View>
+       
+
+          
 
         </ScrollView>
       </KeyboardAvoidingView>

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native'; // Útil para recargar la lista al volver a esta pantalla
 
 const INITIAL_PRODUCTS = [
   { id: '1', codigo: 'P001', nombre: 'Bolsas Camiseta 40x50', categoria: 'Bolsas', marca: 'SV Plastic', stock: 500, ubicacion: 'Estante A1' },
@@ -12,7 +14,48 @@ const INITIAL_PRODUCTS = [
 
 export default function ProductListScreen({ navigation }) {
   const [busqueda, setBusqueda] = useState('');
-  const [productos] = useState(INITIAL_PRODUCTS);
+  const [productos, setProductos] = useState([]);
+  const [usuario, setUsuario] = useState('');
+
+  // 1. Obtener la sesión guardada al montar el componente
+  useEffect(() => {
+    obtenerSesion();
+  }, []);
+
+  // 2. Cargar productos desde AsyncStorage cada vez que la pantalla toma foco
+  useFocusEffect(
+    useCallback(() => {
+      cargarProductos();
+    }, [])
+  );
+
+  const obtenerSesion = async () => {
+    try {
+      const sesionGuardada = await AsyncStorage.getItem('esbiplast_sesion');
+      if (sesionGuardada !== null) {
+        const usuarioActivo = JSON.parse(sesionGuardada);
+        setUsuario(usuarioActivo.usuario);
+        console.log('Usuario actual:', usuarioActivo.usuario);
+      }
+    } catch (e) {
+      console.error('Error al leer el almacenamiento local', e);
+    }
+  };
+
+  const cargarProductos = async () => {
+    try {
+      const productosGuardados = await AsyncStorage.getItem('esbiplast_productos');
+      if (productosGuardados !== null) {
+        setProductos(JSON.parse(productosGuardados));
+      } else {
+        // Si es la primera vez y no hay nada en AsyncStorage, guardamos y usamos la lista inicial
+        await AsyncStorage.setItem('esbiplast_productos', JSON.stringify(INITIAL_PRODUCTS));
+        setProductos(INITIAL_PRODUCTS);
+      }
+    } catch (e) {
+      console.error('Error al cargar productos', e);
+    }
+  };
 
   const productosFiltrados = productos.filter(p => 
     p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -22,8 +65,11 @@ export default function ProductListScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.titulo}>Catálogo de Productos</Text>
-        <TouchableOpacity style={styles.btnNuevo} onPress={() => navigation.navigate('ProductForm')       }>
+        <View>
+          <Text style={styles.titulo}>Catálogo de Productos</Text>
+          {usuario ? <Text style={styles.subtituloUsuario}>Operario: {usuario}</Text> : null}
+        </View>
+        <TouchableOpacity style={styles.btnNuevo} onPress={() => navigation.navigate('ProductForm')}>
           <Text style={styles.btnNuevoTexto}>+ Nuevo</Text>
         </TouchableOpacity>
       </View>
@@ -41,7 +87,7 @@ export default function ProductListScreen({ navigation }) {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={styles.productName}>{item.nombre}</Text>
               <Text style={styles.productDetail}>Código: {item.codigo} | Marca: {item.marca}</Text>
               <Text style={styles.productDetail}>Ubicación: {item.ubicacion}</Text>
@@ -64,7 +110,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justify: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
   },
@@ -72,6 +118,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: '#111827',
+  },
+  subtituloUsuario: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 2,
   },
   btnNuevo: {
     backgroundColor: '#2563eb',
@@ -100,7 +151,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 12,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justify: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e5e7eb',
